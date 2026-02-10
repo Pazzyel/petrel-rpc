@@ -1,5 +1,8 @@
 package rpc.pazz.serialize;
 
+import rpc.pazz.extension.SPI;
+
+@SPI
 public interface Serializer {
 
     /**
