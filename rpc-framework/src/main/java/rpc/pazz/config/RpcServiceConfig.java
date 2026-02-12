@@ -22,11 +22,16 @@ public class RpcServiceConfig {
      */
     private Object service;
 
+    /**
+     * 和RpcRequest的同名方法内容一致
+     * @return 服务名称 (interface + group + version)
+     */
     public String getRpcServiceName() {
         return this.getServiceName() + this.getGroup() + this.getVersion();
     }
 
     public String getServiceName() {
+        //返回实现的接口名字
         return this.service.getClass().getInterfaces()[0].getCanonicalName();
     }
 }

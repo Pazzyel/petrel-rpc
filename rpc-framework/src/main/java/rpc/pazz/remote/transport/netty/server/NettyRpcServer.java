@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Component // AOP
 public class NettyRpcServer {
 
-    private static final int PORT = 9998;
+    public static final int PORT = 9998;
 
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZookeeperServiceProviderImpl.class);
 

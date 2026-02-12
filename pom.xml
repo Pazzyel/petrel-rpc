@@ -18,9 +18,11 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>2.0.17</slf4j.version>
+        <kryo.version>5.6.2</kryo.version>
         <netty.version>4.2.9.Final</netty.version>
         <spring.version>7.0.3</spring.version>
         <guava.version>33.5.0-jre</guava.version>
+        <curator.version>5.9.0</curator.version>
     </properties>
 
     <dependencies>
