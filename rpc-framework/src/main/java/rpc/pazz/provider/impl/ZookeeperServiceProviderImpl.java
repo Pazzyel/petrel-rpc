@@ -21,6 +21,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 保存程序内所有以@RpcService标明的服务实例
+ */
 @Slf4j
 public class ZookeeperServiceProviderImpl implements ServiceProvider {
 
@@ -28,9 +31,9 @@ public class ZookeeperServiceProviderImpl implements ServiceProvider {
      * key: rpc service name(interface name + version + group)
      * value: service object
      */
-    private final Map<String, Object> serviceMap;
-    private final Set<String> registeredService;
-    private final ServiceRegistry serviceRegistry;
+    private final Map<String, Object> serviceMap;//服务实例map
+    private final Set<String> registeredService;//已经注册的服务名称
+    private final ServiceRegistry serviceRegistry;//服务注册器
 
     public ZookeeperServiceProviderImpl() {
         this.serviceMap = new ConcurrentHashMap<>();
