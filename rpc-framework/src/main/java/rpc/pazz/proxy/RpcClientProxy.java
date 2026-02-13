@@ -1,0 +1,71 @@
+package rpc.pazz.proxy;
+
+import lombok.extern.slf4j.Slf4j;
+import rpc.pazz.config.RpcServiceConfig;
+import rpc.pazz.enums.RpcErrorMessageEnum;
+import rpc.pazz.enums.RpcResponseCodeEnum;
+import rpc.pazz.exception.RpcException;
+import rpc.pazz.remote.dto.RpcRequest;
+import rpc.pazz.remote.dto.RpcResponse;
+import rpc.pazz.remote.transport.RpcRequestTransport;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.UUID;
+
+@Slf4j
+public class RpcClientProxy implements InvocationHandler {
+
+    private static final String INTERFACE_NAME = "interfaceName";
+    private final RpcRequestTransport rpcRequestTransport;
+    private final RpcServiceConfig rpcServiceConfig;
+
+    public RpcClientProxy(RpcRequestTransport rpcRequestTransport, RpcServiceConfig rpcServiceConfig) {
+        this.rpcRequestTransport = rpcRequestTransport;
+        this.rpcServiceConfig = rpcServiceConfig;
+    }
+
+    /**
+     * 获取代理对象
+     * @param clazz 代理实现的接口
+     * @return 代理对象
+     * @param <T> 接口类型
+     */
+    public <T> T getProxy(Class<T> clazz) {
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[] { clazz }, this);
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        //创建一个PRC请求
+        log.info("invoked method: [{}]", method.getName());
+        RpcRequest rpcRequest = RpcRequest.builder()
+                .methodName(method.getName())
+                .interfaceName(method.getDeclaringClass().getName())//要和RpcConfig的一致
+                .paramTypes(method.getParameterTypes())
+                .parameters(args)
+                .requestId(UUID.randomUUID().toString()) //和RpcMessage自增的requestId，用于标识消息不一样，这个是随机的，用于标识请求/响应
+                .group(rpcServiceConfig.getGroup())//要和RpcConfig的一致
+                .version(rpcServiceConfig.getVersion())
+                .build();
+        RpcResponse<Object> rpcResponse = (RpcResponse<Object>) rpcRequestTransport.sendRpcRequest(rpcRequest);
+        check(rpcResponse,rpcRequest);
+        return rpcResponse.getData();
+    }
+
+    //检查返回的响应是否合法
+    private void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
+        if (rpcResponse == null) {
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+        //是不是这个请求的响应
+        if (!rpcRequest.getRequestId().equals(rpcResponse.getRequestId())) {
+            throw new RpcException(RpcErrorMessageEnum.REQUEST_NOT_MATCH_RESPONSE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+        //请求是否成功
+        if (rpcResponse.getCode() == null || !rpcResponse.getCode().equals(RpcResponseCodeEnum.SUCCESS.getCode())) {
+            throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
+        }
+    }
+}

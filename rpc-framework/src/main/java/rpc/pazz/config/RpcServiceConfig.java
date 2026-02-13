@@ -32,6 +32,7 @@ public class RpcServiceConfig {
 
     public String getServiceName() {
         //返回实现的接口名字
-        return this.service.getClass().getInterfaces()[0].getCanonicalName();
+        //return this.service.getClass().getInterfaces()[0].getCanonicalName();
+        return this.service.getClass().getInterfaces()[0].getName();//和RpcClientProxy构造RpcRequest是一致
     }
 }
