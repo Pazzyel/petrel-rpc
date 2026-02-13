@@ -25,7 +25,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Component // AOP
+//@Component // 程序启动时需要从Bean找到对应Server并启动 //改用SPI获取实例
 public class NettyRpcServer {
 
     public static final int PORT = 9998;
