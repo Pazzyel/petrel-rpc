@@ -16,6 +16,7 @@ import rpc.pazz.config.RpcServiceConfig;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.provider.ServiceProvider;
 import rpc.pazz.provider.impl.ZookeeperServiceProviderImpl;
+import rpc.pazz.remote.transport.RpcServer;
 import rpc.pazz.remote.transport.netty.codec.RpcMessageCodec;
 import rpc.pazz.remote.transport.netty.codec.RpcMessageFrameDecoder;
 import rpc.pazz.utils.ThreadPoolFactoryUtil;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 //@Component // 程序启动时需要从Bean找到对应Server并启动 //改用SPI获取实例
-public class NettyRpcServer {
+public class NettyRpcServer implements RpcServer {
 
     public static final int PORT = 9998;
 
@@ -36,6 +37,7 @@ public class NettyRpcServer {
         this.serviceProvider.publishService(rpcServiceConfig);
     }
 
+    @Override
     public void start() {
         try {
             //对象准备
