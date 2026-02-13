@@ -6,12 +6,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class SingletonFactory {
     private static final Map<String, Holder<Object>> OBJECT_MAP = new ConcurrentHashMap<>();//保存唯一实例
-    private static final Object lock = new Object();//并发锁对象
+    //private static final Object lock = new Object();//并发锁对象
+    private static final ReentrantLock lock = new ReentrantLock();
 
     private SingletonFactory() {
     }
@@ -27,7 +29,9 @@ public final class SingletonFactory {
             return clazz.cast(holder.get());
         }
 
-        synchronized (lock) {
+        //synchronized (lock) {
+        lock.lock();
+        try {
             //锁范围内再查一次，防止其它线程已经创建
             holder = OBJECT_MAP.computeIfAbsent(key, k -> new Holder<>());
             if (holder.get() == null) {
@@ -37,10 +41,13 @@ public final class SingletonFactory {
                     T instance = constructor.newInstance();
                     holder.set(instance);//不用put回去，因为本来就是从map查出来的
                 } catch (Exception e) {
-                    throw new RuntimeException("创建实例失败",e);
+                    throw new RuntimeException("创建实例失败", e);
                 }
             }
+        } finally {
+            lock.unlock();
         }
+        //}
 
         return clazz.cast(holder.get());//在之前已经被替换为map查出来的对象
     }
@@ -56,7 +63,9 @@ public final class SingletonFactory {
             return clazz.cast(holder.get());
         }
 
-        synchronized (lock) {
+        //synchronized (lock) {
+        lock.lock();
+        try {
             //锁范围内再查一次，防止其它线程已经创建
             holder = OBJECT_MAP.computeIfAbsent(key, k -> new Holder<>());
             if (holder.get() == null) {
@@ -64,10 +73,13 @@ public final class SingletonFactory {
                     T instance = supplier.get();//使用生产者创建
                     holder.set(instance);//不用put回去，因为本来就是从map查出来的
                 } catch (Exception e) {
-                    throw new RuntimeException("创建实例失败",e);
+                    throw new RuntimeException("创建实例失败", e);
                 }
             }
+        } finally {
+            lock.unlock();
         }
+        //}
 
         return clazz.cast(holder.get());//在之前已经被替换为map查出来的对象
     }
@@ -83,7 +95,9 @@ public final class SingletonFactory {
             return clazz.cast(holder.get());
         }
 
-        synchronized (lock) {
+        //synchronized (lock) {
+        lock.lock();
+        try {
             //锁范围内再查一次，防止其它线程已经创建
             holder = OBJECT_MAP.computeIfAbsent(key, k -> new Holder<>());
             if (holder.get() == null) {
@@ -94,10 +108,13 @@ public final class SingletonFactory {
                     consumer.accept(instance);//放入消费者
                     holder.set(instance);//不用put回去，因为本来就是从map查出来的
                 } catch (Exception e) {
-                    throw new RuntimeException("创建实例失败",e);
+                    throw new RuntimeException("创建实例失败", e);
                 }
             }
+        } finally {
+            lock.unlock();
         }
+        //}
 
         return clazz.cast(holder.get());//在之前已经被替换为map查出来的对象
     }

@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /*
  * 1. 单例模式创建对象，减少频繁创建对象带来的负载均衡消耗
@@ -179,43 +180,50 @@ public class ConsistentHashLoadBalance extends AbstractLoadBalance {
             return false;
         }
 
+        private final ReentrantLock lock = new ReentrantLock();
         /**
          * 根据新的地址列表重建哈希环
          */
-        public synchronized void rebuild(List<String> address) {
-            //修改标记表示当前状态不可用
-            this.initFlag = false;
-            if (!hasChanged(address)) {
+        public void rebuild(List<String> address) {
+            //原来是方法级synchronized
+            lock.lock();
+            try {
+                //修改标记表示当前状态不可用
+                this.initFlag = false;
+                if (!hasChanged(address)) {
+                    this.initFlag = true;
+                    return;
+                }
+
+                log.info("重构服务的选择器");
+                List<String> removedNodes = new ArrayList<>();
+                List<String> addedNodes = new ArrayList<>();
+                Set<String> oldNodes = new HashSet<>(this.physicalNodes);
+                Set<String> newNodes = new HashSet<>(address);
+                for (String node : newNodes) {
+                    if (!oldNodes.contains(node)) {
+                        addedNodes.add(node);
+                    }
+                }
+                for (String node : oldNodes) {
+                    if (!newNodes.contains(node)) {
+                        removedNodes.add(node);
+                    }
+                }
+
+                //移除，新增对应节点
+                for (String node : removedNodes) {
+                    this.removeNode(node);
+                }
+                for (String node : addedNodes) {
+                    this.addNode(node);
+                }
+
                 this.initFlag = true;
-                return;
+                log.info("重新构建的列表大小:{}", this.physicalNodes.size());
+            } finally {
+                lock.unlock();
             }
-
-            log.info("重构服务的选择器");
-            List<String> removedNodes = new ArrayList<>();
-            List<String> addedNodes = new ArrayList<>();
-            Set<String> oldNodes = new HashSet<>(this.physicalNodes);
-            Set<String> newNodes = new HashSet<>(address);
-            for (String node : newNodes) {
-                if (!oldNodes.contains(node)) {
-                    addedNodes.add(node);
-                }
-            }
-            for (String node : oldNodes) {
-                if (!newNodes.contains(node)) {
-                    removedNodes.add(node);
-                }
-            }
-
-            //移除，新增对应节点
-            for (String node : removedNodes) {
-                this.removeNode(node);
-            }
-            for (String node : addedNodes) {
-                this.addNode(node);
-            }
-
-            this.initFlag = true;
-            log.info("重新构建的列表大小:{}", this.physicalNodes.size());
         }
     }
 }

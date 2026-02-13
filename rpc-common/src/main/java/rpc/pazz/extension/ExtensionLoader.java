@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 public class ExtensionLoader<T> {
@@ -39,6 +40,12 @@ public class ExtensionLoader<T> {
      * 类缓存，根据名称进行缓存，是从文件中进行读取的key，value，只需要从文件初始化一次
      * */
     private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
+    private final ReentrantLock cachedClassesLock = new ReentrantLock();
+
+    /**
+     * 管理Holder对应的ReentrantLock对象
+     */
+    private final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
     private ExtensionLoader(Class<?> type) {
         this.type = type;
@@ -69,7 +76,7 @@ public class ExtensionLoader<T> {
         if (StringUtil.isBlank(name)) {
             throw new IllegalArgumentException("Extension name should not be null or empty.");
         }
-        Holder<Object> holder = cachedInstances.get(name);
+        Holder<Object> holder = cachedInstances.get(name);//一个name对应一个holder
         //没有就先创建Holder对象
         if (holder == null) {
             cachedInstances.putIfAbsent(name, new Holder<>());
@@ -78,13 +85,20 @@ public class ExtensionLoader<T> {
         //单例模式创建工厂对象
         Object instance = holder.get();
         if (instance == null) {
-            synchronized (holder) {
+            //memory: extension数量有限，为了并发安全不从map移除锁
+            ReentrantLock lock = locks.computeIfAbsent(name, k -> new ReentrantLock());
+            //synchronized (holder) {
+            lock.lock();
+            try {
                 instance = holder.get();
                 if (instance == null) {
                     instance = createExtension(name);
                     holder.set(instance);
                 }
+            } finally {
+                lock.unlock();
             }
+            //}
         }
         
         return (T) instance;
@@ -105,14 +119,20 @@ public class ExtensionLoader<T> {
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
             //没有扩展类，就加锁并从配置文件文件加载出扩展类
-            synchronized (cachedClasses) {
+
+            //synchronized (cachedClasses) {
+            cachedClassesLock.lock();
+            try {
                 classes = cachedClasses.get();
                 if (classes == null) {
                     classes = new HashMap<>();
                     loadDirectory(classes);//从配置文件文件加载出扩展类，放入Map
                     cachedClasses.set(classes);
                 }
+            } finally {
+                cachedClassesLock.unlock();
             }
+            //}
         }
         return classes;
     }
