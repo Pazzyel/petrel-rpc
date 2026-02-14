@@ -35,7 +35,7 @@ public class NettyRpcClient implements RpcRequestTransport {
     private final Bootstrap bootstrap;
 
     public NettyRpcClient() {
-        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.ZK.toString());//使用Zookeeper作为注册中心
+        this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.ZK.getName());//使用Zookeeper作为注册中心
         this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
 

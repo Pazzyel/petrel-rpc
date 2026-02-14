@@ -3,6 +3,7 @@ package rpc.pazz.handler;
 import lombok.extern.slf4j.Slf4j;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.provider.ServiceProvider;
+import rpc.pazz.provider.impl.ZookeeperServiceProviderImpl;
 import rpc.pazz.remote.dto.RpcRequest;
 import rpc.pazz.remote.dto.RpcResponse;
 
@@ -14,7 +15,7 @@ public class RpcRequestHandler {
     private final ServiceProvider serviceProvider;
 
     public RpcRequestHandler() {
-        this.serviceProvider = SingletonFactory.getInstance(ServiceProvider.class);
+        this.serviceProvider = SingletonFactory.getInstance(ZookeeperServiceProviderImpl.class);
     }
 
     //Server调用以处理业务

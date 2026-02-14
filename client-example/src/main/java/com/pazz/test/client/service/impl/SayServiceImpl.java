@@ -9,7 +9,7 @@ import rpc.pazz.test.api.HelloService;
 @Service
 public class SayServiceImpl implements SayService {
 
-    @RpcReference
+    @RpcReference(group = "test1", version = "version1")
     private HelloService helloService;
 
     @Override

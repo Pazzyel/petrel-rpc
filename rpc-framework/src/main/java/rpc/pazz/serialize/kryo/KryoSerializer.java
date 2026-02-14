@@ -4,6 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import rpc.pazz.exception.SerializeException;
+import rpc.pazz.handler.RpcRequestHandler;
+import rpc.pazz.remote.dto.RpcMessage;
 import rpc.pazz.remote.dto.RpcRequest;
 import rpc.pazz.remote.dto.RpcResponse;
 import rpc.pazz.serialize.Serializer;
@@ -20,6 +22,10 @@ public class KryoSerializer implements Serializer {
         Kryo kryo = new Kryo();
         kryo.register(RpcRequest.class);
         kryo.register(RpcResponse.class);
+        kryo.register(RpcMessage.class);
+        kryo.register(java.lang.Class[].class);
+        kryo.register(java.lang.Class.class);
+        kryo.register(java.lang.Object[].class);
         return kryo;
     });
 

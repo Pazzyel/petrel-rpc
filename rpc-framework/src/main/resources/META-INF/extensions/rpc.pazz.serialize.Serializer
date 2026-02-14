@@ -1,1 +1,1 @@
-kyro=rpc.pazz.serialize.kryo.KryoSerializer
+kryo=rpc.pazz.serialize.kryo.KryoSerializer

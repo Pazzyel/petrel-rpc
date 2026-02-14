@@ -10,6 +10,7 @@ import rpc.pazz.config.RpcServiceConfig;
 import rpc.pazz.extension.ExtensionLoader;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.provider.ServiceProvider;
+import rpc.pazz.provider.impl.ZookeeperServiceProviderImpl;
 
 @Slf4j
 @Component
@@ -18,7 +19,7 @@ public class RpcServiceBeanPostProcessor implements BeanPostProcessor {
     private final ServiceProvider serviceProvider;
 
     public RpcServiceBeanPostProcessor() {
-        this.serviceProvider = SingletonFactory.getInstance(ServiceProvider.class);
+        this.serviceProvider = SingletonFactory.getInstance(ZookeeperServiceProviderImpl.class);
     }
 
     @Override

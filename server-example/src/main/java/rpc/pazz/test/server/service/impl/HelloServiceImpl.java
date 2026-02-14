@@ -7,7 +7,7 @@ import rpc.pazz.test.api.HelloService;
 
 @Service
 @Slf4j
-@RpcService
+@RpcService(group = "test1", version = "version1")
 public class HelloServiceImpl implements HelloService {
 
     @Override

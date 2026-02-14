@@ -55,7 +55,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
 
             //重新写入开头的fullLength
             int writerIndex = out.writerIndex();
-            out.writerIndex(writerIndex - fullLength + RpcConstants.MAX_FRAME_LENGTH + 1);
+            out.writerIndex(RpcConstants.MAGIC_NUMBER.length + 1);
             out.writeInt(fullLength);
             out.writerIndex(writerIndex);//重新置到末尾
         } catch (Exception e) {

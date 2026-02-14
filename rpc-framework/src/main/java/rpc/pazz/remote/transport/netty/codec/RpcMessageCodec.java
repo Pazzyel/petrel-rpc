@@ -60,9 +60,10 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
 
             //重新写入开头的fullLength
             int writerIndex = out.writerIndex();
-            out.writerIndex(writerIndex - fullLength + RpcConstants.MAX_FRAME_LENGTH + 1);
+            out.writerIndex(RpcConstants.MAGIC_NUMBER.length + 1);
             out.writeInt(fullLength);
             out.writerIndex(writerIndex);//重新置到末尾
+            log.info("Bytebuf:{}", out);
 
             list.add(out);
         } catch (Exception e) {
@@ -91,6 +92,7 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
         byte codecType = in.readByte();
         byte compressType = in.readByte();
         int requestId = in.readInt();
+        log.info("magicNumber:{}, version:{},", Arrays.toString(magicNumber));
         RpcMessage rpcMessage = RpcMessage.builder().messageType(messageType).codec(codecType).compress(compressType).requestId(requestId).build();
         //检查是不是心跳类消息
         if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {

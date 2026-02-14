@@ -1,1 +1,1 @@
-netty=rpc.pazz.registry.impl.zookeeper.ZookeeperServiceRegistryImpl
+netty=rpc.pazz.remote.transport.netty.client.NettyRpcClient
