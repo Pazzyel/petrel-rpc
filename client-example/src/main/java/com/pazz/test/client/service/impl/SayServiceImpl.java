@@ -13,9 +13,9 @@ public class SayServiceImpl implements SayService {
     private HelloService helloService;
 
     @Override
-    public void say() {
+    public void say(int count) {
         String name = "Pazz";
         String result = helloService.sayHello(name);
-        System.out.println("Received message：" + result);
+        System.out.println("Received message [" + count + "]：" + result);
     }
 }

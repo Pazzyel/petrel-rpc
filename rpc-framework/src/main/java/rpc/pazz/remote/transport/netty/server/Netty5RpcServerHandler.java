@@ -56,7 +56,7 @@ public class Netty5RpcServerHandler extends ChannelInboundHandlerAdapter {
                     RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
                     rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
                     Object result = rpcRequestHandler.handle(rpcRequest);
-                    log.info("server get result: : [{}] ", result);
+                    log.info("server get result: [{}] ", result);
                     if (ctx.channel().isActive() && ctx.channel().isWritable()) {
                         //使用request的id构造对应的response
                         RpcResponse<Object> rpcResponse = RpcResponse.success(result, rpcRequest.getRequestId());

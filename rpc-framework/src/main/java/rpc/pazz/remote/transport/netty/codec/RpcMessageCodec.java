@@ -48,7 +48,7 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
                 String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
                 log.info("use codec :{}", codecName);
                 Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
-                body = serializer.serialize(rpcMessage);
+                body = serializer.serialize(rpcMessage.getData());
                 //根据请求内容获取压缩器并压缩
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
                 log.info("use compress :{}", compressName);
@@ -57,13 +57,15 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
                 //修改fullLength
                 fullLength += body.length;
             }
+            if (body != null) {
+                out.writeBytes(body);
+            }
 
             //重新写入开头的fullLength
             int writerIndex = out.writerIndex();
             out.writerIndex(RpcConstants.MAGIC_NUMBER.length + 1);
             out.writeInt(fullLength);
             out.writerIndex(writerIndex);//重新置到末尾
-            log.info("Bytebuf:{}", out);
 
             list.add(out);
         } catch (Exception e) {
@@ -92,7 +94,6 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
         byte codecType = in.readByte();
         byte compressType = in.readByte();
         int requestId = in.readInt();
-        log.info("magicNumber:{}, version:{},", Arrays.toString(magicNumber));
         RpcMessage rpcMessage = RpcMessage.builder().messageType(messageType).codec(codecType).compress(compressType).requestId(requestId).build();
         //检查是不是心跳类消息
         if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
@@ -114,7 +115,7 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
             Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
             body = compress.decompress(body);
             //再反序列化
-            String codecName = CompressTypeEnum.getName(codecType);
+            String codecName = SerializationTypeEnum.getName(codecType);
             log.info("use codec: {}", codecName);
             Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
             //因为序列化的内容可能是请求，也有可能是响应

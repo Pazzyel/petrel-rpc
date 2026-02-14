@@ -43,7 +43,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
                 String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
                 log.info("use codec :{}", codecName);
                 Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
-                body = serializer.serialize(rpcMessage);
+                body = serializer.serialize(rpcMessage.getData());
                 //根据请求内容获取压缩器并压缩
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
                 log.info("use compress :{}", compressName);
@@ -51,6 +51,9 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
                 body = compress.compress(body);
                 //修改fullLength
                 fullLength += body.length;
+            }
+            if (body != null) {
+                out.writeBytes(body);
             }
 
             //重新写入开头的fullLength

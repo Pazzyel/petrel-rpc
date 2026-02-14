@@ -2,5 +2,5 @@ package com.pazz.test.client.service;
 
 public interface SayService {
 
-    void say();
+    void say(int count);
 }
