@@ -11,6 +11,9 @@
     <modules>
         <module>rpc-framework</module>
         <module>rpc-common</module>
+        <module>server-example</module>
+        <module>client-example</module>
+        <module>hello-service-api</module>
     </modules>
 
     <properties>
