@@ -40,6 +40,7 @@ public class NettyRpcServer implements RpcServer {
     @Override
     public void start() {
         try {
+            log.info("Netty RpcServer starting...");
             //对象准备
             CustomShutdownHook.getCustomShutdownHook().clearAll();//在程序关闭时清理连接资源
             String host = InetAddress.getLocalHost().getHostAddress();

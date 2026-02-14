@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Import(CustomScannerRegistrar.class)
 @Documented
-public @interface RpcScan {
+public @interface EnableRPC {
 
     String[] basePackage();
 

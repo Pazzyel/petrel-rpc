@@ -9,7 +9,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.stereotype.Component;
-import rpc.pazz.annotation.RpcScan;
+import rpc.pazz.annotation.EnableRPC;
 import rpc.pazz.annotation.RpcService;
 
 @Slf4j
@@ -30,7 +30,11 @@ public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
      */
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
-        AnnotationAttributes rpcScanAnnotationAttributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(RpcScan.class.getName()));
+        //只对@EnableRPC的类生效
+        if (!importingClassMetadata.hasAnnotation(EnableRPC.class.getName())) {
+            return;
+        }
+        AnnotationAttributes rpcScanAnnotationAttributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(EnableRPC.class.getName()));
         String[] rpcScanBasePackages = new String[0];
         //获取@RpcScan的basePackage属性的String[]
         if (rpcScanAnnotationAttributes != null) {
