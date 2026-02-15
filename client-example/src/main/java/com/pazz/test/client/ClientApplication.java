@@ -5,10 +5,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import rpc.pazz.annotation.EnableRPC;
+import rpc.pazz.annotation.RpcScan;
 
-import java.util.concurrent.TimeUnit;
-
-@EnableRPC(basePackage = {"com.pazz.test.client"})
+@EnableRPC
 @SpringBootApplication
 public class ClientApplication {
     public static void main(String[] args) {

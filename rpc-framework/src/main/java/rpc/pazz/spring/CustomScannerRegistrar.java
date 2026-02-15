@@ -9,10 +9,11 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.StandardAnnotationMetadata;
 import org.springframework.stereotype.Component;
-import rpc.pazz.annotation.EnableRPC;
+import rpc.pazz.annotation.RpcScan;
 import rpc.pazz.annotation.RpcService;
 
 @Slf4j
+@Deprecated
 public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
     private static final String SPRING_BEAN_BASE_PACKAGE = "rpc.pazz";
@@ -31,10 +32,10 @@ public class CustomScannerRegistrar implements ImportBeanDefinitionRegistrar, Re
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         //只对@EnableRPC的类生效
-        if (!importingClassMetadata.hasAnnotation(EnableRPC.class.getName())) {
+        if (!importingClassMetadata.hasAnnotation(RpcScan.class.getName())) {
             return;
         }
-        AnnotationAttributes rpcScanAnnotationAttributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(EnableRPC.class.getName()));
+        AnnotationAttributes rpcScanAnnotationAttributes = AnnotationAttributes.fromMap(importingClassMetadata.getAnnotationAttributes(RpcScan.class.getName()));
         String[] rpcScanBasePackages = new String[0];
         //获取@RpcScan的basePackage属性的String[]
         if (rpcScanAnnotationAttributes != null) {

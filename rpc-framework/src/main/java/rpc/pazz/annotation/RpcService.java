@@ -1,5 +1,7 @@
 package rpc.pazz.annotation;
 
+import org.springframework.stereotype.Service;
+
 import java.lang.annotation.*;
 
 /**
@@ -9,6 +11,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 @Inherited
+@Service
 public @interface RpcService {
 
     /**

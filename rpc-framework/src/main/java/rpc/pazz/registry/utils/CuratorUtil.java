@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class CuratorUtil {
 
     private static final int BASE_SLEEP_TIME = 1000;
-    private static final int MAX_RETRIES = 10;
+    private static final int MAX_RETRIES = 5;
     private static final int MAX_SLEEP_TIME = 30000;
     private static final int SESSION_TIMEOUT = 60000;
     private static final int CONNECTION_TIMEOUT = 15000;
