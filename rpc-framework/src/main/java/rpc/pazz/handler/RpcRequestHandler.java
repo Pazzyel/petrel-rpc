@@ -5,7 +5,6 @@ import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.provider.ServiceProvider;
 import rpc.pazz.provider.impl.ZookeeperServiceProviderImpl;
 import rpc.pazz.remote.dto.RpcRequest;
-import rpc.pazz.remote.dto.RpcResponse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

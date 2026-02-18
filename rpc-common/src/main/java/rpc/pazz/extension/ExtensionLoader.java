@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.utils.StringUtil;
 
-import javax.imageio.IIOException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

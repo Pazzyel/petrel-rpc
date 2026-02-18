@@ -1,7 +1,6 @@
 package com.pazz.test.client.service.impl;
 
 import com.pazz.test.client.service.SayService;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import rpc.pazz.annotation.RpcReference;
 import rpc.pazz.test.api.HelloService;

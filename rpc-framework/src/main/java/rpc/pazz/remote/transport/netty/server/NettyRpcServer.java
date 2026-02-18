@@ -10,7 +10,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import rpc.pazz.config.CustomShutdownHook;
 import rpc.pazz.config.RpcServiceConfig;
 import rpc.pazz.factory.SingletonFactory;

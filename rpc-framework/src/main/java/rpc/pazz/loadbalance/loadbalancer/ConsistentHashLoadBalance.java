@@ -1,10 +1,8 @@
 package rpc.pazz.loadbalance.loadbalancer;
 
-import com.google.common.hash.HashFunction;
 import lombok.extern.slf4j.Slf4j;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.loadbalance.AbstractLoadBalance;
-import rpc.pazz.loadbalance.LoadBalance;
 import rpc.pazz.remote.dto.RpcRequest;
 
 import java.security.MessageDigest;

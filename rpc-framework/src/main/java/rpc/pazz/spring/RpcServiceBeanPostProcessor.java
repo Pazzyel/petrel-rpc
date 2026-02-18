@@ -7,7 +7,6 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 import rpc.pazz.annotation.RpcService;
 import rpc.pazz.config.RpcServiceConfig;
-import rpc.pazz.extension.ExtensionLoader;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.provider.ServiceProvider;
 import rpc.pazz.provider.impl.ZookeeperServiceProviderImpl;

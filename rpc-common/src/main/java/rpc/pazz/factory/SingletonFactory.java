@@ -3,7 +3,6 @@ package rpc.pazz.factory;
 import rpc.pazz.extension.Holder;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
