@@ -30,12 +30,6 @@ public class NettyRpcServer implements RpcServer {
 
     public static final int PORT = 9998;
 
-    private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZookeeperServiceProviderImpl.class);
-
-    public void registerService(RpcServiceConfig rpcServiceConfig) {
-        this.serviceProvider.publishService(rpcServiceConfig);
-    }
-
     @Override
     public void start() {
         try {

@@ -1,1 +1,2 @@
 nettyServer=rpc.petrel.remote.transport.netty.server.NettyRpcServer
+socketServer=rpc.petrel.remote.transport.socket.server.SocketRpcServer

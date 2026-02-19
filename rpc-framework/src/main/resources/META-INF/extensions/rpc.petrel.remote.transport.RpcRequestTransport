@@ -1,1 +1,2 @@
 netty=rpc.petrel.remote.transport.netty.client.NettyRpcClient
+socket=rpc.petrel.remote.transport.socket.client.SocketRpcClient
