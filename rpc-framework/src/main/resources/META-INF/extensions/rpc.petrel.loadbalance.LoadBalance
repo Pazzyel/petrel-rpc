@@ -1,0 +1,1 @@
+loadBalance=rpc.petrel.loadbalance.loadbalancer.ConsistentHashLoadBalance

@@ -1,0 +1,1 @@
+kryo=rpc.petrel.serialize.kryo.KryoSerializer

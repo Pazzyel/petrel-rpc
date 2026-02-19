@@ -30,7 +30,7 @@ petrel:
   compression: gzip
 ```
 
-在`rpc.pazz.properties.PropertyResolver`定义了会加载的配置文件的名称。
+在`rpc.petrel.properties.PropertyResolver`定义了会加载的配置文件的名称。
 
 配置文件将以`application.yaml`->`application.yml`->`application.properties`的顺序解析，只有当前解析的配置文件每次不存在，才会查找按顺序的下一个文件。多个不同配置文件只会按优先级加载最高的那个。
 

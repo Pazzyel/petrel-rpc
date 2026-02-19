@@ -4,7 +4,7 @@ import com.pazz.test.client.service.SayService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import rpc.pazz.annotation.EnableRPC;
+import rpc.petrel.annotation.EnableRPC;
 
 @EnableRPC
 @SpringBootApplication

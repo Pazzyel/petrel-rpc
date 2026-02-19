@@ -1,0 +1,1 @@
+gzip=rpc.petrel.compress.gzip.GzipCompress

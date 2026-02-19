@@ -1,0 +1,1 @@
+zk=rpc.petrel.registry.impl.zookeeper.ZookeeperServiceRegistryImpl
