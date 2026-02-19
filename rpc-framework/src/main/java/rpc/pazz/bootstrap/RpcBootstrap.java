@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import rpc.pazz.annotation.RpcService;
 import rpc.pazz.enums.RpcServerEnum;
 import rpc.pazz.extension.ExtensionLoader;
+import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.remote.transport.RpcServer;
 
 import java.util.Map;
@@ -18,7 +20,9 @@ public class RpcBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
     private final AtomicBoolean serverStarted = new AtomicBoolean(false);
 
-    private final RpcServer rpcServer = ExtensionLoader.getExtensionLoader(RpcServer.class).getExtension(RpcServerEnum.NETTY.getName());
+    private final RpcProperties properties = SingletonFactory.getInstance(RpcProperties.class);
+
+    private final RpcServer rpcServer = ExtensionLoader.getExtensionLoader(RpcServer.class).getExtension(properties.getServerType().getName());
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {

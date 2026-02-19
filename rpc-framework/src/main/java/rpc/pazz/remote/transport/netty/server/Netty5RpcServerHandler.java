@@ -13,6 +13,7 @@ import rpc.pazz.enums.RpcResponseCodeEnum;
 import rpc.pazz.enums.SerializationTypeEnum;
 import rpc.pazz.factory.SingletonFactory;
 import rpc.pazz.handler.RpcRequestHandler;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.remote.constants.RpcConstants;
 import rpc.pazz.remote.dto.RpcMessage;
 import rpc.pazz.remote.dto.RpcRequest;
@@ -26,9 +27,13 @@ public class Netty5RpcServerHandler extends ChannelInboundHandlerAdapter {
     private final RpcRequestHandler rpcRequestHandler;
     private final ExecutorService executor;
 
+    private final RpcProperties properties;
+
     public Netty5RpcServerHandler(EventExecutorGroup executor) {
         this.rpcRequestHandler = SingletonFactory.getInstance(RpcRequestHandler.class);
         this.executor = executor;
+
+        this.properties = SingletonFactory.getInstance(RpcProperties.class);
     }
 
     @Override
@@ -45,8 +50,8 @@ public class Netty5RpcServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("server receive msg: [{}] ", msg);
                 byte messageType = requestMessage.getMessageType();
                 RpcMessage rpcMessage = RpcMessage.builder()
-                        .codec(SerializationTypeEnum.KRYO.getCode())
-                        .compress(CompressTypeEnum.GZIP.getCode()).build();//RpcMessage发送是不构造requestId
+                        .codec(properties.getSerializationType().getCode())
+                        .compress(properties.getCompressionType().getCode()).build();//RpcMessage发送是不构造requestId
                 if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
                     //是心跳请求
                     rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);

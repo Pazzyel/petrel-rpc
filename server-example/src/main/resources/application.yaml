@@ -1,5 +1,5 @@
 server:
-  port: 9081
+  port: 8054
 petrel:
   registry:
     type: zookeeper

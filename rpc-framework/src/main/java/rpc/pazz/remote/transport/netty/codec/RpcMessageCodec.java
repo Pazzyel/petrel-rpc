@@ -8,6 +8,8 @@ import rpc.pazz.compress.Compress;
 import rpc.pazz.enums.CompressTypeEnum;
 import rpc.pazz.enums.SerializationTypeEnum;
 import rpc.pazz.extension.ExtensionLoader;
+import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.remote.constants.RpcConstants;
 import rpc.pazz.remote.dto.RpcMessage;
 import rpc.pazz.remote.dto.RpcRequest;
@@ -24,6 +26,8 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
     //as the global request id
     private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
 
+    private final RpcProperties properties = SingletonFactory.getInstance(RpcProperties.class);
+
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMessage rpcMessage, List<Object> list) throws Exception {
         ByteBuf out = ctx.alloc().buffer();
@@ -36,7 +40,7 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
             byte messageType = rpcMessage.getMessageType();
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
-            out.writeByte(CompressTypeEnum.GZIP.getCode());
+            out.writeByte(rpcMessage.getCompress());
             out.writeInt(ATOMIC_INTEGER.getAndIncrement());
 
             //构建消息体

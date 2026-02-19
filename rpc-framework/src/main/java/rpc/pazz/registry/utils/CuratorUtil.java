@@ -12,6 +12,8 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs.Ids;
 import rpc.pazz.enums.RpcConfigEnum;
+import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.utils.PropertiesFileUtil;
 
 import java.net.InetSocketAddress;
@@ -39,6 +41,8 @@ public class CuratorUtil {
     private static CuratorFramework zkClient;
     private static final String DEFAULT_ZOOKEEPER_ADDRESS = "127.0.0.1:2181";
 
+    private static final RpcProperties properties = SingletonFactory.getInstance(RpcProperties.class);
+
     public static void bindConnectionStateListener(CuratorFramework zkClient) {
         zkClient.getConnectionStateListenable().addListener((client, newState) -> {
             switch (newState) {
@@ -57,10 +61,7 @@ public class CuratorUtil {
     public static CuratorFramework getZkClient() {
         // check if user has set zk address
         // 获取rpc.properties的配置
-        Properties properties = PropertiesFileUtil.readPropertiesFile(RpcConfigEnum.RPC_CONFIG_PATH.getPropertyValue());
-        String zookeeperAddress = properties != null &&
-                properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue() /*rpc.zookeeper.address*/) != null
-                ? properties.getProperty(RpcConfigEnum.ZK_ADDRESS.getPropertyValue()) : DEFAULT_ZOOKEEPER_ADDRESS;
+        String zookeeperAddress = properties.getRegistryAddress();
         // if zkClient has been started, return directly
         if (zkClient != null && zkClient.getState() == CuratorFrameworkState.STARTED) {
             return zkClient;

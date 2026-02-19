@@ -1,6 +1,6 @@
-# PetrelRPC
+# Petrel RPC
 
-风燕RPC是一款用于微服务之间调用的RPC工具。使用少数几个注解就可以轻松完成RPC的服务注册，服务发现功能
+Petrel RPC是一款用于微服务之间调用的RPC工具。使用少数几个注解就可以轻松完成RPC的服务注册，服务发现功能
 
 本项目采用Zookeeper作为注册中心，不同服务之间通过Netty进行通信，内容使用Kryo算法序列化+Gzip算法压缩
 
@@ -16,11 +16,25 @@ docker run -d --name zookeeper -p 2181:2181 zookeeper:3.8.5
 
 请使用较新的版本，旧的版本（3.5.8）实测会出现连接不稳定的问题
 
-在项目的`resource`目录下，创建文件`rpc.properties`，里面指定Zookeeper的连接地址。如果没有该配置内容，将使用默认地址`127.0.0.1:2181`
+在项目的`resource`目录下，在配置文件`application.yaml`，里面指定Zookeeper的连接地址。如果没有该配置内容，将使用默认地址`127.0.0.1:2181`
 
-```properties
-rpc.zookeeper.address=127.0.0.1:2181
+你还可以指定其它的相关配置，下面的是所有可配置项的默认值
+
+```yaml
+petrel:
+  registry:
+    type: zookeeper
+    address: localhost:2181
+  connection: netty
+  serializer: kryo
+  compression: gzip
 ```
+
+在`rpc.pazz.properties.PropertyResolver`定义了会加载的配置文件的名称。
+
+配置文件将以`application.yaml`->`application.yml`->`application.properties`的顺序解析，只有当前解析的配置文件每次不存在，才会查找按顺序的下一个文件。多个不同配置文件只会按优先级加载最高的那个。
+
+配置文件的这一部分配置读取，并不是使用Spring Boot来进行的，因此通过Spring Boot提供的`spring.profiles.active`来指定活跃的其它配置文件（如`application-dev.yaml`）是无效的。配置只能写在`application.yaml/application.yml/application.properties`中。
 
 ## 在Spring Boot项目中使用
 

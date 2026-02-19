@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import rpc.pazz.enums.CompressTypeEnum;
 import rpc.pazz.enums.SerializationTypeEnum;
 import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.remote.constants.RpcConstants;
 import rpc.pazz.remote.dto.RpcMessage;
 import rpc.pazz.remote.dto.RpcResponse;
@@ -23,9 +24,12 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
     private final UnprocessedRequests unprocessedRequests;
     private final NettyRpcClient nettyRpcClient;
 
+    private final RpcProperties properties;
+
     public NettyRpcClientHandler() {
         this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
         this.nettyRpcClient = SingletonFactory.getInstance(NettyRpcClient.class);
+        this.properties = SingletonFactory.getInstance(RpcProperties.class);
     }
 
     //收到消息的回调函数
@@ -58,8 +62,8 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
                 log.info("Writer idle happened [{}]", ctx.channel().remoteAddress());
                 Channel channel = nettyRpcClient.getChannel((InetSocketAddress) ctx.channel().remoteAddress()); //mark:直接ctx.channel ?
                 RpcMessage rpcMessage = RpcMessage.builder()
-                        .codec(SerializationTypeEnum.KRYO.getCode())
-                        .compress(CompressTypeEnum.GZIP.getCode())
+                        .codec(properties.getSerializationType().getCode())
+                        .compress(properties.getCompressionType().getCode())
                         .messageType(RpcConstants.HEARTBEAT_REQUEST_TYPE)
                         .data(RpcConstants.PING).build();
                 channel.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);

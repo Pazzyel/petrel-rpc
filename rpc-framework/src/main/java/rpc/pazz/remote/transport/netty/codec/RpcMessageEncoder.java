@@ -31,7 +31,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
             byte messageType = rpcMessage.getMessageType();
             out.writeByte(messageType);
             out.writeByte(rpcMessage.getCodec());
-            out.writeByte(CompressTypeEnum.GZIP.getCode());
+            out.writeByte(rpcMessage.getCompress());
             out.writeInt(ATOMIC_INTEGER.getAndIncrement());
 
             //构建消息体

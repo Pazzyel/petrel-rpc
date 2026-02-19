@@ -6,6 +6,8 @@ import rpc.pazz.enums.RpcErrorMessageEnum;
 import rpc.pazz.enums.ServiceRegistryEnum;
 import rpc.pazz.exception.RpcException;
 import rpc.pazz.extension.ExtensionLoader;
+import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.provider.ServiceProvider;
 import rpc.pazz.registry.ServiceRegistry;
 import rpc.pazz.remote.transport.netty.server.NettyRpcServer;
@@ -31,10 +33,14 @@ public class ZookeeperServiceProviderImpl implements ServiceProvider {
     private final Set<String> registeredService;//已经注册的服务名称
     private final ServiceRegistry serviceRegistry;//服务注册器
 
+    private final RpcProperties properties;
+
     public ZookeeperServiceProviderImpl() {
+        this.properties = SingletonFactory.getInstance(RpcProperties.class);
+
         this.serviceMap = new ConcurrentHashMap<>();
         this.registeredService = ConcurrentHashMap.newKeySet();
-        this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(ServiceRegistryEnum.ZK.getName());
+        this.serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getExtension(properties.getRegistryType().getName());
     }
 
     /**

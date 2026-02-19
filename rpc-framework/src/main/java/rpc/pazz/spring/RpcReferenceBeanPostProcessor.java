@@ -9,6 +9,8 @@ import rpc.pazz.annotation.RpcReference;
 import rpc.pazz.config.RpcServiceConfig;
 import rpc.pazz.enums.RpcRequestTransportEnum;
 import rpc.pazz.extension.ExtensionLoader;
+import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.proxy.RpcClientProxy;
 import rpc.pazz.remote.transport.RpcRequestTransport;
 
@@ -20,8 +22,11 @@ public class RpcReferenceBeanPostProcessor implements BeanPostProcessor {
 
     private final RpcRequestTransport rpcClient;
 
+    private final RpcProperties properties;
+
     public RpcReferenceBeanPostProcessor() {
-        this.rpcClient = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(RpcRequestTransportEnum.NETTY.getName());
+        this.properties = SingletonFactory.getInstance(RpcProperties.class);
+        this.rpcClient = ExtensionLoader.getExtensionLoader(RpcRequestTransport.class).getExtension(properties.getClientType().getName());
     }
 
     @Override

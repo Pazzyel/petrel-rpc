@@ -12,6 +12,7 @@ import rpc.pazz.enums.SerializationTypeEnum;
 import rpc.pazz.enums.ServiceDiscoveryEnum;
 import rpc.pazz.extension.ExtensionLoader;
 import rpc.pazz.factory.SingletonFactory;
+import rpc.pazz.properties.RpcProperties;
 import rpc.pazz.registry.ServiceDiscovery;
 import rpc.pazz.remote.constants.RpcConstants;
 import rpc.pazz.remote.dto.RpcMessage;
@@ -33,11 +34,13 @@ public class NettyRpcClient implements RpcRequestTransport {
 
     private final EventLoopGroup eventLoopGroup;
     private final Bootstrap bootstrap;
+    private final RpcProperties properties;
 
     public NettyRpcClient() {
         this.serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getExtension(ServiceDiscoveryEnum.ZK.getName());//使用Zookeeper作为注册中心
         this.unprocessedRequests = SingletonFactory.getInstance(UnprocessedRequests.class);
         this.channelProvider = SingletonFactory.getInstance(ChannelProvider.class);
+        this.properties = SingletonFactory.getInstance(RpcProperties.class);
 
         RpcMessageCodec codec = new RpcMessageCodec();//有状态的类不要用单例
 
@@ -72,8 +75,8 @@ public class NettyRpcClient implements RpcRequestTransport {
             unprocessedRequests.put(rpcRequest.getRequestId(), future);
             RpcMessage rpcMessage = RpcMessage.builder()
                     .messageType(RpcConstants.REQUEST_TYPE)
-                    .codec(SerializationTypeEnum.KRYO.getCode())
-                    .compress(CompressTypeEnum.GZIP.getCode())
+                    .codec(properties.getSerializationType().getCode())
+                    .compress(properties.getCompressionType().getCode())
                     .data(rpcRequest).build();
             channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) f -> {
                 //回调的主要作用是在失败时能够移除unprocessedRequests的对应项
