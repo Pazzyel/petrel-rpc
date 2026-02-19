@@ -1,18 +1,17 @@
 package rpc.petrel.remote.transport.socket.server;
 
-import io.netty.channel.ChannelFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.enums.RpcResponseCodeEnum;
 import rpc.petrel.factory.SingletonFactory;
 import rpc.petrel.handler.RpcRequestHandler;
 import rpc.petrel.properties.RpcProperties;
-import rpc.petrel.provider.ServiceProvider;
 import rpc.petrel.remote.constants.RpcConstants;
 import rpc.petrel.remote.dto.RpcMessage;
 import rpc.petrel.remote.dto.RpcRequest;
 import rpc.petrel.remote.dto.RpcResponse;
 import rpc.petrel.remote.transport.socket.codec.RpcMessageStreamCodec;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,36 +33,66 @@ public class SocketRpcServerHandler implements Runnable {
     public void run() {
         try {
             InputStream in = socket.getInputStream();
-            RpcMessage requestMessage = codec.decodeAndReadMessage(in);
-            log.info("server receive msg: [{}] ", requestMessage);
-            byte messageType = requestMessage.getMessageType();
-            RpcMessage rpcMessage = RpcMessage.builder()
-                    .codec(properties.getSerializationType().getCode())
-                    .compress(properties.getCompressionType().getCode()).build();//RpcMessage发送是不构造requestId
-            if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
-                //是心跳请求
-                rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
-                rpcMessage.setData(RpcConstants.PONG);
-            } else {
-                //是普通请求
-                RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
-                rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
-                Object result = rpcRequestHandler.handle(rpcRequest);
-                log.info("server get result: [{}] ", result);
-                if (!socket.isClosed() && socket.isConnected()) {
-                    //使用request的id构造对应的response
-                    RpcResponse<Object> rpcResponse = RpcResponse.success(result, rpcRequest.getRequestId());
-                    rpcMessage.setData(rpcResponse);
-                } else {
-                    log.error("server write fail: [{}] ", rpcRequest);
-                    RpcResponse<Object> rpcResponse = RpcResponse.fail(RpcResponseCodeEnum.FAIL);
-                    rpcMessage.setData(rpcResponse);
-                }
-            }
             OutputStream out = socket.getOutputStream();
-            codec.writeAndFlushWithEncode(out, rpcMessage);
+
+            // 因为连接复用，长连接需要让服务端线程在同一个Socket上持续读取
+            while (!socket.isClosed() && socket.isConnected()) {
+                RpcMessage requestMessage;
+                try {
+                    requestMessage = codec.decodeAndReadMessage(in);
+                } catch (EOFException e) {
+                    log.info("client disconnected [{}]", socket.getInetAddress());
+                    break;
+                }
+
+                if (requestMessage == null) {
+                    break;
+                }
+
+                log.info("server receive msg: [{}]", requestMessage);
+                RpcMessage responseMessage = buildResponse(requestMessage);
+                codec.writeAndFlushWithEncode(out, responseMessage);
+            }
         } catch (IOException e) {
-            log.error("处理来自{}的RPC请求失败:",socket.getInetAddress(), e);
+            log.error("process rpc request from [{}] failed", socket.getInetAddress(), e);
+        } finally {
+            try {
+                if (!socket.isClosed()) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                log.warn("close socket [{}] failed", socket.getInetAddress(), e);
+            }
         }
+    }
+
+    private RpcMessage buildResponse(RpcMessage requestMessage) {
+        byte messageType = requestMessage.getMessageType();
+        RpcMessage rpcMessage = RpcMessage.builder()
+                .messageType(RpcConstants.RESPONSE_TYPE)
+                .codec(properties.getSerializationType().getCode())
+                .compress(properties.getCompressionType().getCode())
+                .requestId(requestMessage.getRequestId())
+                .build();
+
+        if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
+            rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
+            rpcMessage.setData(RpcConstants.PONG);
+            return rpcMessage;
+        }
+
+        RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
+        Object result = rpcRequestHandler.handle(rpcRequest);
+        log.info("server get result: [{}]", result);
+
+        if (!socket.isClosed() && socket.isConnected()) {
+            RpcResponse<Object> rpcResponse = RpcResponse.success(result, rpcRequest.getRequestId());
+            rpcMessage.setData(rpcResponse);
+        } else {
+            log.error("server write fail: [{}]", rpcRequest);
+            RpcResponse<Object> rpcResponse = RpcResponse.fail(RpcResponseCodeEnum.FAIL);
+            rpcMessage.setData(rpcResponse);
+        }
+        return rpcMessage;
     }
 }
