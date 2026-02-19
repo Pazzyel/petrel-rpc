@@ -90,5 +90,10 @@ public class SayServiceImpl implements SayService {
 
 因为使用的JDK动态代理，通过`@RpcService`注册的服务必须实现一个接口，注入对应的`@RpcReference`字段的类型只能是这个接口
 
+## 配置的其它可选项
 
+### connection
+
+- netty: 默认情况下使用Netty进行网络通信，充分利用NIO模型的特点，使用少量的线程来处理多个连接的通信，提高了I/O效率和并发
+- socket: 可以先择使用Java原生Socket，因为服务端采用了JDK21的虚拟线程，避免了传统OS线程创建和阻塞成本高的问题。维护成本较低且性能和netty不会有非常明显的差异
 

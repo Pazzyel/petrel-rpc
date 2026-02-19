@@ -86,10 +86,12 @@ public class RpcMessageStreamCodec {
                 .build();
 
         if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
+            log.debug("received heartbeat request");
             rpcMessage.setData(RpcConstants.PING);
             return rpcMessage;
         }
         if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
+            log.debug("received heartbeat response");
             rpcMessage.setData(RpcConstants.PONG);
             return rpcMessage;
         }
@@ -100,12 +102,12 @@ public class RpcMessageStreamCodec {
             in.readFully(body);
 
             String compressName = CompressTypeEnum.getName(compressType);
-            log.info("use compress: {}", compressName);
+            log.debug("use compress: {}", compressName);
             Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
             body = compress.decompress(body);
 
             String codecName = SerializationTypeEnum.getName(codecType);
-            log.info("use codec: {}", codecName);
+            log.debug("use codec: {}", codecName);
             Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
             if (messageType == RpcConstants.REQUEST_TYPE) {
                 RpcRequest request = serializer.deserialize(body, RpcRequest.class);

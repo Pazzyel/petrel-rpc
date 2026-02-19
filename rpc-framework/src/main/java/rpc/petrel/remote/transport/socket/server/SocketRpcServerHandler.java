@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 @Slf4j
 public class SocketRpcServerHandler implements Runnable {
+
+    private static final int SERVER_IDLE_TIMEOUT_MILLIS = 30_000;
 
     private final Socket socket;
     private final RpcRequestHandler rpcRequestHandler = SingletonFactory.getInstance(RpcRequestHandler.class);
@@ -32,14 +35,17 @@ public class SocketRpcServerHandler implements Runnable {
     @Override
     public void run() {
         try {
+            socket.setSoTimeout(SERVER_IDLE_TIMEOUT_MILLIS);
             InputStream in = socket.getInputStream();
             OutputStream out = socket.getOutputStream();
 
-            // 因为连接复用，长连接需要让服务端线程在同一个Socket上持续读取
             while (!socket.isClosed() && socket.isConnected()) {
                 RpcMessage requestMessage;
                 try {
                     requestMessage = codec.decodeAndReadMessage(in);
+                } catch (SocketTimeoutException e) {
+                    log.info("close idle socket [{}] after {} ms", socket.getInetAddress(), SERVER_IDLE_TIMEOUT_MILLIS);
+                    break;
                 } catch (EOFException e) {
                     log.info("client disconnected [{}]", socket.getInetAddress());
                     break;
@@ -49,7 +55,6 @@ public class SocketRpcServerHandler implements Runnable {
                     break;
                 }
 
-                log.info("server receive msg: [{}]", requestMessage);
                 RpcMessage responseMessage = buildResponse(requestMessage);
                 codec.writeAndFlushWithEncode(out, responseMessage);
             }
@@ -83,13 +88,11 @@ public class SocketRpcServerHandler implements Runnable {
 
         RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
         Object result = rpcRequestHandler.handle(rpcRequest);
-        log.info("server get result: [{}]", result);
 
         if (!socket.isClosed() && socket.isConnected()) {
             RpcResponse<Object> rpcResponse = RpcResponse.success(result, rpcRequest.getRequestId());
             rpcMessage.setData(rpcResponse);
         } else {
-            log.error("server write fail: [{}]", rpcRequest);
             RpcResponse<Object> rpcResponse = RpcResponse.fail(RpcResponseCodeEnum.FAIL);
             rpcMessage.setData(rpcResponse);
         }
