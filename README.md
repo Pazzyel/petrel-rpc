@@ -95,5 +95,5 @@ public class SayServiceImpl implements SayService {
 ### connection
 
 - `netty`: 默认情况下使用Netty进行网络通信，充分利用NIO模型的特点，使用少量的线程来处理多个连接的通信，提高了I/O效率和并发
-- `socket`: 可以先择使用Java原生Socket，因为服务端采用了JDK21的虚拟线程，避免了传统OS线程创建和阻塞成本高的问题。维护成本较低且性能和netty不会有非常明显的差异
+- `socket`: 可以选择使用Java原生Socket，因为服务端采用了JDK21的虚拟线程，避免了传统OS线程创建和阻塞成本高的问题。维护成本较低且性能和Netty不会有非常明显的差异
 
