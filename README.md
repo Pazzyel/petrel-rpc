@@ -90,15 +90,85 @@ public class SayServiceImpl implements SayService {
 
 因为使用的JDK动态代理，通过`@RpcService`注册的服务必须实现一个接口，注入对应的`@RpcReference`字段的类型只能是这个接口
 
+## 异步调用
+
+当使用 Netty 通信时，支持异步调用模式
+
+```java
+public interface HelloService {
+    Person sayHello(Name name, Long age);
+
+    @AsyncMethod
+    default Future<Person> sayHelloAsync(Name name, Long age) {
+        return CompletableFuture.completedFuture(sayHello(name, age));
+    }
+}
+```
+
+在`@RpcService`注册的服务实现的这个接口里，新增对应方法的异步版本，使用`@AsyncMethod`来说明这是一个RPC调用方法的异步版本，它和原方法的区别是返回的类型是`Future<T>`，其中`T`是该方法的同步版本的返回类型，名字上需要以`Async`结尾，前面的方法名称则和原来的名称相同
+
+也可以配置`@AsyncMethod(originName = "sayHello")`来指定该异步方法的原方法名称，那么此时这个异步方法的名称就不再需要以`Async`结尾，可以是任意的名字
+
+因为这个接口里的异步方法只是为了让代理类可以拥有并执行对应的方法，原来的服务不应该实现，调用这个接口的所有异步方法。推荐在接口中为异步方法提供默认实现，默认实现可以使用`CompletableFuture.completedFuture()`封装原方法的调用结果
+
+调用方发起该方法的异步版本时，使用`Future`提供的`get()`方法将会阻塞到获得返回结果
+
+```java
+@Service
+public class SayServiceImpl implements SayService {
+
+    @RpcReference(group = "test1", version = "version1")
+    private HelloService helloService;
+
+    @Override
+    public void say(int count) {
+        String name = "Me";
+        // 现在这个调用是不阻塞的
+        Future<String> future = helloService.sayHelloAsync(name);
+        System.out.println("This is [" + count + "] " + "waiting");
+        // 你还可以执行其它操作
+        // ...... 
+        
+        
+        // 调用get()会开始阻塞直到获得返回结果
+        String result = future.get();
+        System.out.println("Received message [" + count + "]：" + result);
+    }
+}
+```
+
+如果使用 Socket 通信，因为 Socket 是阻塞式I/O，所以并没有添加它对异步方法的支持。如果你坚持使用上面的方式调用，那么该异步版本不会和同步版本有任何差异，均为阻塞式的调用。拿到的`Future`对象一定是已经就绪的
+
 ## 配置选项
 
 ### serializer
 
-- `kryo`，使用该序列化器，需要注册RPC传输的类
+- `kryo`，使用该序列化器，默认需要注册RPC传输的类。在`KryoClassRegistrar`的实现类中向参数添加你要注册的类，这个实现类需要作为Spring Bean被管理
 
+```java
+@Component
+public class UserKryoClassRegister implements KryoClassRegistrar {
+    @Override
+    public void registerClasses(List<Class<?>> registry) {
+        registry.add(Person.class);
+        registry.add(Name.class);
+        registry.add(Age.class);
+    }
+}
+```
+
+RPC调用的参数，返回值类都要注册，除了基本类型及其包装类。如果类里还包含其它未注册类型的字段，必须也按同样的逻辑递归注册这些字段的类型
+
+如果你不想注册，可以在配置文件中提供如下配置，以关闭Kryo对注册要序列化的类的需求。这会降低序列化的性能
+
+```yaml
+petrel:
+  config:
+    kryo-registration: false
+```
 
 ### connection
 
-- `netty`: 默认情况下使用Netty进行网络通信，充分利用NIO模型的特点，使用少量的线程来处理多个连接的通信，提高了I/O效率和并发
+- `netty`: 默认情况下使用Netty进行网络通信，充分利用NIO模型的特点，使用少量的线程来处理多个连接的通信，提高了I/O效率和并发，还可以支持异步调用
 - `socket`: 可以先择使用Java原生Socket，因为服务端采用了JDK21的虚拟线程，避免了传统OS线程创建和阻塞成本高的问题。维护成本较低且性能和netty不会有非常明显的差异
 
