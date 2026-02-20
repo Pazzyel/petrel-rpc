@@ -1,14 +1,14 @@
 package rpc.petrel.serialize.kryo;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KryoUserClassesContainer {
 
-    // 并发只发生在读过程，好像也没必要用Concurrent ?
-    static Set<Class<?>> needRegister = ConcurrentHashMap.newKeySet();
+    // 并发只发生在读过程,没必要用线程安全类
+    private static List<Class<?>> needRegister = new ArrayList<>();
 
-    static Set<Class<?>> getNeedRegister() {
+    static List<Class<?>> getNeedRegister() {
         return needRegister;
     }
 }

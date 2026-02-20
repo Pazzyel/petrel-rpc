@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import rpc.petrel.annotation.RpcReference;
 import rpc.petrel.async.RpcFuture;
 import rpc.petrel.test.api.HelloService;
+import rpc.petrel.test.api.Name;
 import rpc.petrel.test.api.Person;
 
 @Service
@@ -16,7 +17,7 @@ public class SayServiceImpl implements SayService {
     @Override
     public void say(int count) {
         String name = "Pazz";
-        RpcFuture<Person> future = helloService.sayHelloAlso(name);
+        RpcFuture<Person> future = helloService.sayHelloAsync(new Name(name), 20L);
         System.out.println("This is [" + count + "] " + "waiting");
         Person result = future.get();
         System.out.println("Received message [" + count + "]：" + result);

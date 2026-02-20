@@ -18,7 +18,7 @@ docker run -d --name zookeeper -p 2181:2181 zookeeper:3.8.5
 
 在项目的`resource`目录下，在配置文件`application.yaml`，里面指定Zookeeper的连接地址。如果没有该配置内容，将使用默认地址`127.0.0.1:2181`
 
-你还可以指定其它的相关配置，下面的是所有可配置项的默认值
+你还可以指定其它的相关配置，下面的是所有可配置项的默认值。注意默认使用的Kryo序列化器需要注册要传输的类，详见配置选项部分
 
 ```yaml
 petrel:
@@ -90,7 +90,12 @@ public class SayServiceImpl implements SayService {
 
 因为使用的JDK动态代理，通过`@RpcService`注册的服务必须实现一个接口，注入对应的`@RpcReference`字段的类型只能是这个接口
 
-## 配置的其它可选项
+## 配置选项
+
+### serializer
+
+- `kryo`，使用该序列化器，需要注册RPC传输的类
+
 
 ### connection
 

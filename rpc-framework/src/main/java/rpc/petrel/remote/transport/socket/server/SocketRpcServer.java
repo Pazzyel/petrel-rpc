@@ -25,7 +25,7 @@ public class SocketRpcServer implements RpcServer {
         try (ServerSocket server = new ServerSocket()) {
             String host = InetAddress.getLocalHost().getHostAddress();
             server.bind(new InetSocketAddress(host, PORT));
-            log.info("Server started on adddress {}:{}", host, PORT);
+            log.info("Socket server started on adddress {}:{}", host, PORT);
             CustomShutdownHook.getCustomShutdownHook().clearAll();
             Socket socket;
             while ((socket = server.accept()) != null) {

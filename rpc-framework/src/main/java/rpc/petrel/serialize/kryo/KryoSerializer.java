@@ -11,6 +11,9 @@ import rpc.petrel.serialize.Serializer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class KryoSerializer implements Serializer {
 
@@ -23,8 +26,11 @@ public class KryoSerializer implements Serializer {
         kryo.register(java.lang.Class[].class);
         kryo.register(java.lang.Class.class);
         kryo.register(java.lang.Object[].class);
+        // 这会作为单例加载，也就是说，同样不会有并发安全问题
+        List<Class<?>> userClasses = KryoUserClassesContainer.getNeedRegister();
+        userClasses.sort(Comparator.comparing(Class::getName)); // 必须保证无论用户怎么注册，最后注册到Kryo的顺序都一样
         // 添加用户自定义注册类
-        for (Class<?> c: KryoUserClassesContainer.getNeedRegister()) {
+        for (Class<?> c: userClasses) {
             kryo.register(c);
         }
         return kryo;

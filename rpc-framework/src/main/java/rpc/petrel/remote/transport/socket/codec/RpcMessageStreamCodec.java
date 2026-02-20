@@ -35,12 +35,12 @@ public class RpcMessageStreamCodec {
         int fullLength = RpcConstants.HEAD_LENGTH;
         if (messageType != RpcConstants.HEARTBEAT_REQUEST_TYPE && messageType != RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
             String codecName = SerializationTypeEnum.getName(codecType);
-            log.info("use codec :{}", codecName);
+            log.debug("use codec :{}", codecName);
             Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
             body = serializer.serialize(rpcMessage.getData());
 
             String compressName = CompressTypeEnum.getName(compressType);
-            log.info("use compress :{}", compressName);
+            log.debug("use compress :{}", compressName);
             Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
             body = compress.compress(body);
             fullLength += body.length;

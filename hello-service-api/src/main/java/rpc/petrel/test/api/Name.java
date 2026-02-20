@@ -9,7 +9,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @ToString
-public class Person {
-    private Name name;
-    private Age age;
+public class Name {
+    private String name;
 }
