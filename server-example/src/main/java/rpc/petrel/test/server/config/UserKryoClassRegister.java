@@ -7,7 +7,6 @@ import rpc.petrel.test.api.Name;
 import rpc.petrel.test.api.Person;
 
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class UserKryoClassRegister implements KryoClassRegistrar {

@@ -2,7 +2,6 @@ package rpc.petrel.proxy;
 
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.annotation.AsyncMethod;
-import rpc.petrel.async.RpcFuture;
 import rpc.petrel.config.RpcServiceConfig;
 import rpc.petrel.enums.RpcErrorMessageEnum;
 import rpc.petrel.enums.RpcResponseCodeEnum;
@@ -17,7 +16,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class RpcClientProxy implements InvocationHandler {
@@ -66,9 +65,13 @@ public class RpcClientProxy implements InvocationHandler {
                     .group(rpcServiceConfig.getGroup())//要和RpcConfig的一致
                     .version(rpcServiceConfig.getVersion())
                     .build();
-            Future<RpcResponse<Object>> future = rpcRequestTransport.sendRpcRequestAsync(rpcRequest);
-            // 返回自定义future类型
-            return new RpcFuture<>(future,rpcRequest);
+            CompletableFuture<RpcResponse<Object>> future = rpcRequestTransport.sendRpcRequestAsync(rpcRequest);
+            // 返回CompletableFuture<T>，不阻塞的链式编程正是CompletableFuture的强大之处
+            return future.thenApply(resp -> {
+                check(resp,rpcRequest);
+                return resp.getData();
+            });
+
         } else {
             RpcRequest rpcRequest = RpcRequest.builder()
                     .methodName(method.getName())
@@ -86,7 +89,7 @@ public class RpcClientProxy implements InvocationHandler {
     }
 
     //检查返回的响应是否合法
-    public static void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
+    private static void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
         if (rpcResponse == null) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());
         }
