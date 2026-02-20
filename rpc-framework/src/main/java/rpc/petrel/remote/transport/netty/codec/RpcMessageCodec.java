@@ -50,12 +50,12 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
             if (messageType != RpcConstants.HEARTBEAT_REQUEST_TYPE && messageType != RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
                 //根据请求内容获取序列化器并序列化
                 String codecName = SerializationTypeEnum.getName(rpcMessage.getCodec());
-                log.info("use codec :{}", codecName);
+                log.debug("use codec :{}", codecName);
                 Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
                 body = serializer.serialize(rpcMessage.getData());
                 //根据请求内容获取压缩器并压缩
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
-                log.info("use compress :{}", compressName);
+                log.debug("use compress :{}", compressName);
                 Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
                 body = compress.compress(body);
                 //修改fullLength

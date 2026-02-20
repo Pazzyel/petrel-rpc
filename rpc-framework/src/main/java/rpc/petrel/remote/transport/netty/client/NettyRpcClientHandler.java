@@ -38,7 +38,7 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
             if (msg instanceof RpcMessage rpcMessage) {
                 byte messageType = rpcMessage.getMessageType();
                 if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
-                    log.info("Heartbeat [{}]", rpcMessage.getData());
+                    log.debug("Heartbeat [{}]", rpcMessage.getData());
                 } else if (messageType == RpcConstants.RESPONSE_TYPE) {
                     log.info("Response [{}]", rpcMessage.getData());
                     //收到内容调用对应消息的CompletableFuture
@@ -57,7 +57,7 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent idleStateEvent) {
             IdleState state = idleStateEvent.state();
             if (IdleState.WRITER_IDLE.equals(state)) {
-                log.info("Writer idle happened [{}]", ctx.channel().remoteAddress());
+                log.debug("Writer idle happened [{}]", ctx.channel().remoteAddress());
                 Channel channel = nettyRpcClient.getChannel((InetSocketAddress) ctx.channel().remoteAddress()); //mark:直接ctx.channel ?
                 RpcMessage rpcMessage = RpcMessage.builder()
                         .codec(properties.getSerializationType().getCode())

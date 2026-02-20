@@ -4,6 +4,6 @@ petrel:
   registry:
     type: zookeeper
     address: 127.0.1.1:2181
-  connection: socket
+  connection: netty
   serializer: kryo
   compression: gzip

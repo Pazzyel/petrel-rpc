@@ -155,7 +155,7 @@ public class CuratorUtil {
     }
 
     /**
-     * 获取一个节点下的所有子节点
+     * 获取一个节点下的所有子节点，带缓存，使用watcher更新
      * @param rpcServiceName rpc service 名称，也是节点的路径
      * @return 路径下所有子节点
      */
@@ -172,7 +172,6 @@ public class CuratorUtil {
         try {
             result = zkClient.getChildren().forPath(servicePath);
             SERVICE_ADDRESS_MAP.put(rpcServiceName, result);
-            //不使用watcher
             //注册watcher监控子节点变化情况
             registerWatcher(zkClient, rpcServiceName);
         } catch (Exception e) {

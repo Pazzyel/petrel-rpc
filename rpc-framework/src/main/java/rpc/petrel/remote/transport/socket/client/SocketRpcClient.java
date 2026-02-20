@@ -1,6 +1,7 @@
 package rpc.petrel.remote.transport.socket.client;
 
 import lombok.extern.slf4j.Slf4j;
+import rpc.petrel.exception.UnsupportedInvokeException;
 import rpc.petrel.extension.ExtensionLoader;
 import rpc.petrel.factory.SingletonFactory;
 import rpc.petrel.properties.RpcProperties;
@@ -8,6 +9,7 @@ import rpc.petrel.registry.ServiceDiscovery;
 import rpc.petrel.remote.constants.RpcConstants;
 import rpc.petrel.remote.dto.RpcMessage;
 import rpc.petrel.remote.dto.RpcRequest;
+import rpc.petrel.remote.dto.RpcResponse;
 import rpc.petrel.remote.transport.RpcRequestTransport;
 import rpc.petrel.remote.transport.socket.codec.RpcMessageStreamCodec;
 
@@ -17,11 +19,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
@@ -77,6 +75,11 @@ public class SocketRpcClient implements RpcRequestTransport {
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
+        throw new UnsupportedInvokeException("Socket client does not support async calls");
     }
 
     private Socket getSocket(InetSocketAddress address) {

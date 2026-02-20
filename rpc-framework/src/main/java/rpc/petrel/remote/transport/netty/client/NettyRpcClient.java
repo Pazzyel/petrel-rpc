@@ -7,7 +7,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
-import rpc.petrel.enums.ServiceDiscoveryEnum;
 import rpc.petrel.extension.ExtensionLoader;
 import rpc.petrel.factory.SingletonFactory;
 import rpc.petrel.properties.RpcProperties;
@@ -22,6 +21,7 @@ import rpc.petrel.remote.transport.netty.codec.RpcMessageFrameDecoder;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @Slf4j
 public class NettyRpcClient implements RpcRequestTransport {
@@ -65,6 +65,19 @@ public class NettyRpcClient implements RpcRequestTransport {
     @Override
     public Object sendRpcRequest(RpcRequest rpcRequest) {
 
+        //获取异步对象
+        Future<RpcResponse<Object>> future = sendRpcRequestAsync(rpcRequest);
+
+        //获取结果
+        try {
+            return future.get();
+        } catch (Exception e) {
+            throw new RuntimeException("rpc请求失败," + e.getMessage());
+        }
+    }
+
+    @Override
+    public Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
         //获取连接
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
         Channel channel = this.getChannel(address);
@@ -91,12 +104,7 @@ public class NettyRpcClient implements RpcRequestTransport {
             throw new IllegalStateException();
         }
 
-        //获取结果
-        try {
-            return future.get();
-        } catch (Exception e) {
-            throw new RuntimeException("rpc请求失败," + e.getMessage());
-        }
+        return future;
     }
 
     //建立channel并缓存
