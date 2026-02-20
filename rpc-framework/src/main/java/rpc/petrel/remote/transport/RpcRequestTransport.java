@@ -4,7 +4,7 @@ import rpc.petrel.extension.SPI;
 import rpc.petrel.remote.dto.RpcRequest;
 import rpc.petrel.remote.dto.RpcResponse;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 
 @SPI
 public interface RpcRequestTransport {
@@ -19,7 +19,6 @@ public interface RpcRequestTransport {
      * send rpc request to server and get async result
      * @param rpcRequest message body
      * @return CompletableFuture object
-     * 为什么不返回Future而是CompletableFuture，详见async下的RpcFuture
      */
-    Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest);
+    CompletableFuture<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest);
 }

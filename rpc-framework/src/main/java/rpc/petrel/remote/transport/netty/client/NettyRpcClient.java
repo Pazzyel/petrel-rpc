@@ -82,7 +82,7 @@ public class NettyRpcClient implements RpcRequestTransport {
     }
 
     @Override
-    public Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
+    public CompletableFuture<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
         //获取连接
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
         Channel channel = this.getChannel(address);

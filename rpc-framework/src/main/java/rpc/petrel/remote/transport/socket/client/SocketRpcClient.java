@@ -83,7 +83,7 @@ public class SocketRpcClient implements RpcRequestTransport {
 
     // 阻塞I/O，包装阻塞结果
     @Override
-    public Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
+    public CompletableFuture<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
         return CompletableFuture.completedFuture((RpcResponse<Object>) sendRpcRequest(rpcRequest));
     }
 
