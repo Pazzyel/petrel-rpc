@@ -17,6 +17,9 @@ public class RpcProperties {
 
     private String compression = "gzip";
 
+    @Getter
+    private Boolean kryoRegistration = true;
+
     private PropertyResolver resolver;
 
     public RpcProperties() {
@@ -27,6 +30,7 @@ public class RpcProperties {
         this.connection = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.REGISTRY_CONNECTION),"netty");
         this.serializer = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.SERIALIZER),"kryo");
         this.compression = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.COMPRESSION),"gzip");
+        this.kryoRegistration = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.KRYO_REGISTRATION),"true").equals("true");
     }
 
 
