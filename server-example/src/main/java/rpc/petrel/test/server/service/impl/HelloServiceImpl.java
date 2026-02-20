@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import rpc.petrel.annotation.RpcService;
 import rpc.petrel.test.api.HelloService;
+import rpc.petrel.test.api.Person;
 
 @Service
 @Slf4j
@@ -11,8 +12,8 @@ import rpc.petrel.test.api.HelloService;
 public class HelloServiceImpl implements HelloService {
 
     @Override
-    public String sayHello(String name) {
+    public Person sayHello(String name) {
         log.info("Received request from: {}", name);
-        return "Hello " + name;
+        return new Person(name);
     }
 }

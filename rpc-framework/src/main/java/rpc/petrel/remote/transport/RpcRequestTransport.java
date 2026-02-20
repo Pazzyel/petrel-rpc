@@ -4,13 +4,12 @@ import rpc.petrel.extension.SPI;
 import rpc.petrel.remote.dto.RpcRequest;
 import rpc.petrel.remote.dto.RpcResponse;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 @SPI
 public interface RpcRequestTransport {
     /**
-     * send rpc request to server and get result
+     * send rpc request to server and get result, not include heartbeat
      * @param rpcRequest message body
      * @return data from server
      */

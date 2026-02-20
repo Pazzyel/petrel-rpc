@@ -10,6 +10,9 @@ public class ChannelProvider {
 
     private final Map<String, Channel> channelMap = new ConcurrentHashMap<>();
 
+    /**
+     * 返回有效的channel
+     */
     public Channel get(InetSocketAddress remoteAddress) {
         String key = remoteAddress.toString();
         if (channelMap.containsKey(key)) {

@@ -1,7 +1,6 @@
 package rpc.petrel.remote.transport.socket.client;
 
 import lombok.extern.slf4j.Slf4j;
-import rpc.petrel.exception.UnsupportedInvokeException;
 import rpc.petrel.extension.ExtensionLoader;
 import rpc.petrel.factory.SingletonFactory;
 import rpc.petrel.properties.RpcProperties;
@@ -39,6 +38,11 @@ public class SocketRpcClient implements RpcRequestTransport {
 
     private final ScheduledExecutorService heartbeatExecutor = Executors.newScheduledThreadPool(1);
 
+    /**
+     * 发送普通Rpc请求
+     * @param rpcRequest message body
+     * @return 返回类型只有可能是RpcResponse<Object>
+     */
     @Override
     public Object sendRpcRequest(RpcRequest rpcRequest) {
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
@@ -77,14 +81,16 @@ public class SocketRpcClient implements RpcRequestTransport {
         }
     }
 
+    // 阻塞I/O，包装阻塞结果
     @Override
     public Future<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
-        throw new UnsupportedInvokeException("Socket client does not support async calls");
+        return CompletableFuture.completedFuture((RpcResponse<Object>) sendRpcRequest(rpcRequest));
     }
 
+    // 获取已经创建的连接，没有或者失效就重建一个
     private Socket getSocket(InetSocketAddress address) {
         Socket socket = socketProvider.get(address);
-        if (socket == null) {
+        if (socket == null || socket.isClosed() || !socket.isConnected()) {
             try {
                 socket = new Socket();
                 socket.connect(address);

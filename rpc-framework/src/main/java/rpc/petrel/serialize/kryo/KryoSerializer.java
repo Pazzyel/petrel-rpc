@@ -23,6 +23,10 @@ public class KryoSerializer implements Serializer {
         kryo.register(java.lang.Class[].class);
         kryo.register(java.lang.Class.class);
         kryo.register(java.lang.Object[].class);
+        // 添加用户自定义注册类
+        for (Class<?> c: KryoUserClassesContainer.getNeedRegister()) {
+            kryo.register(c);
+        }
         return kryo;
     });
 

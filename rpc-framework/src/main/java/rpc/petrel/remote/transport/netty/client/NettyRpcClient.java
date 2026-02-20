@@ -62,6 +62,11 @@ public class NettyRpcClient implements RpcRequestTransport {
                 });
     }
 
+    /**
+     * 阻塞发送普通Rpc请求
+     * @param rpcRequest message body
+     * @return 返回类型只有可能是RpcResponse<Object>
+     */
     @Override
     public Object sendRpcRequest(RpcRequest rpcRequest) {
 
@@ -107,7 +112,9 @@ public class NettyRpcClient implements RpcRequestTransport {
         return future;
     }
 
-    //建立channel并缓存
+    /**
+     * 获取缓存的channel，如果不存在或者已经失效则重新建立连接
+     */
     public Channel getChannel(InetSocketAddress remoteAddress) {
         Channel channel = channelProvider.get(remoteAddress);
         if (channel == null) {

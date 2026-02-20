@@ -115,12 +115,12 @@ public class RpcMessageCodec extends MessageToMessageCodec<ByteBuf, RpcMessage> 
             in.readBytes(body);
             //按照发消息的顺序反过来，先解压缩
             String compressName = CompressTypeEnum.getName(compressType);
-            log.info("use compress: {}", compressName);
+            log.debug("use compress: {}", compressName);
             Compress compress = ExtensionLoader.getExtensionLoader(Compress.class).getExtension(compressName);
             body = compress.decompress(body);
             //再反序列化
             String codecName = SerializationTypeEnum.getName(codecType);
-            log.info("use codec: {}", codecName);
+            log.debug("use codec: {}", codecName);
             Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class).getExtension(codecName);
             //因为序列化的内容可能是请求，也有可能是响应
             if (messageType == RpcConstants.REQUEST_TYPE) {

@@ -13,6 +13,7 @@ import rpc.petrel.remote.transport.RpcServer;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+//该Bean会加载RpcServer
 @Slf4j
 @Component
 public class RpcBootstrap implements ApplicationListener<ContextRefreshedEvent> {

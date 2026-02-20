@@ -15,6 +15,7 @@ import rpc.petrel.remote.transport.RpcRequestTransport;
 
 import java.lang.reflect.Field;
 
+//该Bean会加载RpcClient
 @Slf4j
 @Component
 public class RpcReferenceBeanPostProcessor implements BeanPostProcessor {

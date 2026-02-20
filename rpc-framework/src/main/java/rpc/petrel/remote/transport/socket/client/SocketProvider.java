@@ -1,6 +1,5 @@
 package rpc.petrel.remote.transport.socket.client;
 
-import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;

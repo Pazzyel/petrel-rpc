@@ -13,12 +13,10 @@ import rpc.petrel.remote.dto.RpcResponse;
 import rpc.petrel.remote.transport.RpcRequestTransport;
 import rpc.petrel.utils.StringUtil;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 @Slf4j
@@ -46,7 +44,7 @@ public class RpcClientProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        //创建一个PRC请求
+        //创建一个RPC请求
         log.info("invoked method: [{}]", method.getName());
         AsyncMethod asyncMethod = method.getAnnotation(AsyncMethod.class);
         if (asyncMethod != null) {

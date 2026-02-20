@@ -27,5 +27,5 @@ public class RpcMessage {
     /**
      * request data
      */
-    private Object data;
+    private Object data; // RpcResponse or String
 }
