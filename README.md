@@ -136,10 +136,9 @@ public class SayServiceImpl implements SayService {
 
 ### serializer
 
-- `kryo`，使用该序列化器，默认需要注册RPC传输的类。在`KryoClassRegistrar`的实现类中向参数添加你要注册的类，这个实现类需要作为Spring Bean被管理
+- `kryo`，使用该序列化器，默认需要注册RPC传输的类。在`KryoClassRegistrar`的实现类中向参数添加你要注册的类
 
 ```java
-@Component
 public class UserKryoClassRegister implements KryoClassRegistrar {
     @Override
     public void registerClasses(List<Class<?>> registry) {
@@ -149,6 +148,16 @@ public class UserKryoClassRegister implements KryoClassRegistrar {
     }
 }
 ```
+
+在你的`resources/META-INF/extensions`目录下，创建文件`rpc.petrel.serialize.kryo.KryoClassRegistrar`，内容应该是
+
+```properties
+register=com.pazz.test.client.config.UserKryoClassRegister
+```
+
+其中`=`后面跟着你的`KryoClassRegistrar`的实现类的包名
+
+如果你不想使用上面的方法，也可以在你的实现类上加上`@Component`或其它注解，让这个实现类作为Spring Bean被管理，效果相同
 
 RPC调用的参数，返回值类都要注册，除了基本类型及其包装类。如果类里还包含其它未注册类型的字段，必须也按同样的逻辑递归注册这些字段的类型
 
