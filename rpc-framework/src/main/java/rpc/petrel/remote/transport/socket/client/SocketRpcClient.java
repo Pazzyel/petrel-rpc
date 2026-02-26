@@ -3,6 +3,7 @@ package rpc.petrel.remote.transport.socket.client;
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.extension.ExtensionLoader;
 import rpc.petrel.factory.SingletonFactory;
+import rpc.petrel.filter.ProviderFilterContext;
 import rpc.petrel.properties.RpcProperties;
 import rpc.petrel.registry.ServiceDiscovery;
 import rpc.petrel.remote.constants.RpcConstants;
@@ -48,6 +49,8 @@ public class SocketRpcClient implements RpcRequestTransport {
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
         String key = address.toString();
         ReentrantLock lock = socketLocks.computeIfAbsent(key, k -> new ReentrantLock());
+
+        ProviderFilterContext.invoke(rpcRequest);
 
         lock.lock();
         try {

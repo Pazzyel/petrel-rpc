@@ -90,6 +90,50 @@ public class SayServiceImpl implements SayService {
 
 因为使用的JDK动态代理，通过`@RpcService`注册的服务必须实现一个接口，注入对应的`@RpcReference`字段的类型只能是这个接口
 
+## 上下文传递
+
+有的项目会使用`ThreadLocal`来存储当前用户id，但是在RPC调用的情况下，`ThreadLocal`当然不可能共享，必须额外传递
+
+在RPC调用中有需要传递上下文（如userId）的情况，但是RPC方法本身并没有相关参数，因此本项目提供在请求过程携带额外上下文的功能
+
+你需要实现`PetrelFilter`的`invoke()`方法来实现添加请求上下文，其实现类必须有`@Activate`注解并带有`group`属性。其中`CONSUMER`代表服务消费者，也就是发起RPC调用的客户端，`PROVIDER`代表服务提供者，也就是接受RPC调用并处理的服务端
+
+```java
+@Activate(group = TypeEnum.CONSUMER)
+public class UserPetrelFilter implements PetrelFilter {
+
+    @Override
+    public void invoke(Invocation invocation) {
+        invocation.setAttachment("user-id", 1017002892456L + "");
+    }
+}
+```
+
+在服务的消费者中，`setAttachment()`类似HTTP请求的Header，你可以向其中添加新的键值对
+
+```java
+@Activate(group = TypeEnum.PROVIDER)
+public class UserFilter implements PetrelFilter {
+    @Override
+    public void invoke(Invocation invocation) {
+        String userId = invocation.getAttachment("user-id");
+        System.out.println("user-id: " + userId);
+    }
+}
+```
+
+在服务的提供者中，`getAttachment()`可以获取消费者提供的对应上下文
+
+你需要注册自己的`Filter`，在`resources/META-INF/extensions`目录下，创建文件`rpc.petrel.filter.PetrelFilter`，内容是
+
+```properties
+filter=com.pazz.test.client.filter.UserPetrelFilter
+```
+
+`=`之前的`filter`名字是任意的，之后的内容是你的`PetrelFilter`的实现类，你可以在多行指定多个名字不同的`filter`
+
+如果你不想使用上面的注册方法，也可以在你的实现类上加上`@Component`或其它注解，让这个实现类作为Spring Bean被管理
+
 ## 异步调用
 
 当使用 Netty 通信时，支持异步调用模式
@@ -149,7 +193,7 @@ public class UserKryoClassRegister implements KryoClassRegistrar {
 }
 ```
 
-在你的`resources/META-INF/extensions`目录下，创建文件`rpc.petrel.serialize.kryo.KryoClassRegistrar`，内容应该是
+在`resources/META-INF/extensions`目录下，创建文件`rpc.petrel.serialize.kryo.KryoClassRegistrar`，内容应该是
 
 ```properties
 register=com.pazz.test.client.config.UserKryoClassRegister
@@ -157,9 +201,9 @@ register=com.pazz.test.client.config.UserKryoClassRegister
 
 其中`=`后面跟着你的`KryoClassRegistrar`的实现类的包名
 
-如果你不想使用上面的方法，也可以在你的实现类上加上`@Component`或其它注解，让这个实现类作为Spring Bean被管理，效果相同
+如果你不想使用上面的注册方法，也可以在你的实现类上加上`@Component`或其它注解，让这个实现类作为Spring Bean被管理
 
-RPC调用的参数，返回值类都要注册，除了基本类型及其包装类。如果类里还包含其它未注册类型的字段，必须也按同样的逻辑递归注册这些字段的类型
+RPC调用的参数，返回值，在attachment里设置的内容，都要注册，除了基本类型及其包装类。如果类里还包含其它未注册类型的字段，必须也按同样的逻辑递归注册这些字段的类型
 
 如果你不想注册，可以在配置文件中提供如下配置，以关闭Kryo对注册要序列化的类的需求。这会降低序列化的性能
 

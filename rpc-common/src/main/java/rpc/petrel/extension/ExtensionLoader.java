@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -69,6 +67,13 @@ public class ExtensionLoader<T> {
             extensionLoader = (ExtensionLoader<S>) EXTENSION_LOADERS.get(clazz);
         }
         return extensionLoader;
+    }
+
+    public List<T> getAllExtensions() {
+        Map<String,Class<?>> classes = getExtensionClasses();
+        List<T> extensions = new ArrayList<>();
+        classes.forEach((name, v) -> extensions.add(getExtension(name)));
+        return extensions;
     }
 
     public T getExtension(String name) {

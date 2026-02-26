@@ -3,6 +3,7 @@ package rpc.petrel.remote.transport.socket.server;
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.enums.RpcResponseCodeEnum;
 import rpc.petrel.factory.SingletonFactory;
+import rpc.petrel.filter.ProviderFilterContext;
 import rpc.petrel.handler.RpcRequestHandler;
 import rpc.petrel.properties.RpcProperties;
 import rpc.petrel.remote.constants.RpcConstants;
@@ -87,6 +88,10 @@ public class SocketRpcServerHandler implements Runnable {
         }
 
         RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
+
+        //进行filter操作
+        ProviderFilterContext.invoke(rpcRequest);
+
         Object result = rpcRequestHandler.handle(rpcRequest);
 
         if (!socket.isClosed() && socket.isConnected()) {

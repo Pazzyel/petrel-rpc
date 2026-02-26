@@ -15,6 +15,7 @@ import rpc.petrel.utils.StringUtil;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -64,6 +65,7 @@ public class RpcClientProxy implements InvocationHandler {
                     .requestId(UUID.randomUUID().toString()) //和RpcMessage自增的requestId，用于标识消息不一样，这个是随机的，用于标识请求/响应
                     .group(rpcServiceConfig.getGroup())//要和RpcConfig的一致
                     .version(rpcServiceConfig.getVersion())
+                    .attachment(new HashMap<>())
                     .build();
             CompletableFuture<RpcResponse<Object>> future = rpcRequestTransport.sendRpcRequestAsync(rpcRequest);
             // 返回CompletableFuture<T>，不阻塞的链式编程正是CompletableFuture的强大之处
