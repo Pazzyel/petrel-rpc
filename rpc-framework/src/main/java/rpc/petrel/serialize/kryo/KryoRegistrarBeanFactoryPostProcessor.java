@@ -13,7 +13,7 @@ public class KryoRegistrarBeanFactoryPostProcessor implements BeanFactoryPostPro
         Map<String, KryoClassRegistrar> registrars = beanFactory.getBeansOfType(KryoClassRegistrar.class);
         for (KryoClassRegistrar r : registrars.values()) {
             // 调用对应方法，将会注册用户的Class
-            r.registerClasses(KryoUserClassesContainer.getNeedRegister());
+            r.registerClasses(KryoUserClassesContext.getNeedRegister());
         }
     }
 
