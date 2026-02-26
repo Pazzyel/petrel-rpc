@@ -34,8 +34,10 @@ public class KryoSerializer implements Serializer {
             kryo.register(java.lang.Class[].class);
             kryo.register(java.lang.Class.class);
             kryo.register(java.lang.Object[].class);
+            kryo.register(java.lang.String.class);
+            kryo.register(java.util.HashMap.class);
             // 这会作为单例加载，也就是说，同样不会有并发安全问题
-            List<Class<?>> userClasses = new ArrayList<>(KryoUserClassesContainer.getNeedRegister());
+            List<Class<?>> userClasses = new ArrayList<>(KryoUserClassesContext.getNeedRegister());
             userClasses.sort(Comparator.comparing(Class::getName)); // 必须保证无论用户怎么注册，最后注册到Kryo的顺序都一样
             // 添加用户自定义注册类
             for (Class<?> c : userClasses) {

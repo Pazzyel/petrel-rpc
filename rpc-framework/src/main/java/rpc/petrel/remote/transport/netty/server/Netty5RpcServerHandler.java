@@ -10,6 +10,8 @@ import io.netty.util.concurrent.EventExecutorGroup;
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.enums.RpcResponseCodeEnum;
 import rpc.petrel.factory.SingletonFactory;
+import rpc.petrel.filter.ConsumerFilterContext;
+import rpc.petrel.filter.ProviderFilterContext;
 import rpc.petrel.handler.RpcRequestHandler;
 import rpc.petrel.properties.RpcProperties;
 import rpc.petrel.remote.constants.RpcConstants;
@@ -57,6 +59,10 @@ public class Netty5RpcServerHandler extends ChannelInboundHandlerAdapter {
                 } else {
                     //是普通请求
                     RpcRequest rpcRequest = (RpcRequest) requestMessage.getData();
+
+                    //处理Filter
+                    ProviderFilterContext.invoke(rpcRequest);
+
                     rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
                     Object result = rpcRequestHandler.handle(rpcRequest);
                     log.info("server get handled result: [{}] ", result);

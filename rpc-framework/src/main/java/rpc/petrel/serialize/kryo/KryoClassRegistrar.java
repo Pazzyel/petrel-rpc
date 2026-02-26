@@ -1,7 +1,10 @@
 package rpc.petrel.serialize.kryo;
 
-import java.util.List;
+import rpc.petrel.extension.SPI;
 
+import java.util.Set;
+
+@SPI
 public interface KryoClassRegistrar {
-    void registerClasses(List<Class<?>> registry);
+    void registerClasses(Set<Class<?>> registry);
 }

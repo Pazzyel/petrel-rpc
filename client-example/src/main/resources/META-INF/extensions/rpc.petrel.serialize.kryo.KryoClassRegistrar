@@ -1,0 +1,1 @@
+register=com.pazz.test.client.config.UserKryoClassRegister

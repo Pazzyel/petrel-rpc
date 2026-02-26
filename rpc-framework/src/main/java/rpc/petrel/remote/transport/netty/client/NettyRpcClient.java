@@ -9,6 +9,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import rpc.petrel.extension.ExtensionLoader;
 import rpc.petrel.factory.SingletonFactory;
+import rpc.petrel.filter.ConsumerFilterContext;
+import rpc.petrel.filter.ProviderFilterContext;
 import rpc.petrel.properties.RpcProperties;
 import rpc.petrel.registry.ServiceDiscovery;
 import rpc.petrel.remote.constants.RpcConstants;
@@ -86,6 +88,9 @@ public class NettyRpcClient implements RpcRequestTransport {
         //获取连接
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
         Channel channel = this.getChannel(address);
+
+        //进行filter操作
+        ConsumerFilterContext.invoke(rpcRequest);
 
         CompletableFuture<RpcResponse<Object>> future = new CompletableFuture<>();
         if (channel != null && channel.isActive()) {
