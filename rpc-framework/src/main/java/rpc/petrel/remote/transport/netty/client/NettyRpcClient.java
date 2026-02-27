@@ -87,6 +87,7 @@ public class NettyRpcClient implements RpcRequestTransport {
     public CompletableFuture<RpcResponse<Object>> sendRpcRequestAsync(RpcRequest rpcRequest) {
         //获取连接
         InetSocketAddress address = this.serviceDiscovery.lookupService(rpcRequest);
+        // WARN: 这里拿到消息后如果对方服务下线，发送会失败
         Channel channel = this.getChannel(address);
 
         //进行filter操作

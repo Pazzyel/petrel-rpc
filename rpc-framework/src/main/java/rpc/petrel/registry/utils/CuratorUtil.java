@@ -166,8 +166,11 @@ public class CuratorUtil {
         }
 
         List<String> cached = SERVICE_ADDRESS_MAP.get(rpcServiceName);
+        if (cached != null && !cached.isEmpty()) {
+            return cached;
+        }
 
-        List<String> result = null;
+        List<String> result = List.of();
         String servicePath = ZK_REGISTER_ROOT_PATH + "/" + rpcServiceName;
         try {
             result = zkClient.getChildren().forPath(servicePath);
@@ -176,9 +179,6 @@ public class CuratorUtil {
             registerWatcher(zkClient, rpcServiceName);
         } catch (Exception e) {
             log.error("Get children nodes for path [{}] fail", servicePath);
-
-            return cached;
-
         }
         return result;
     }
@@ -208,6 +208,8 @@ public class CuratorUtil {
         try {
             List<String> serviceAddresses = zkClient.getChildren().forPath(servicePath);
             SERVICE_ADDRESS_MAP.put(rpcServiceName, serviceAddresses);
+            // watcher是一次性的，触发后必须重新注册
+            registerWatcher(zkClient, rpcServiceName);
         } catch (Exception e) {
             log.error("refresh service addresses for path [{}] fail", servicePath, e);
         }
