@@ -1,1 +1,2 @@
 kryo=rpc.petrel.serialize.kryo.KryoSerializer
+protostuff=rpc.petrel.serialize.protostuff.ProtostuffSerializer

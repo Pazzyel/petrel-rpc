@@ -27,6 +27,8 @@
         <springboot.version>4.0.1</springboot.version>
         <guava.version>33.5.0-jre</guava.version>
         <curator.version>5.9.0</curator.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
+        <protostuff.version>1.6.0</protostuff.version>
     </properties>
 
     <dependencies>

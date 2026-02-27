@@ -28,7 +28,7 @@ public class RpcProperties {
         this.registry.setType(Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.REGISTRY_TYPE),"zookeeper"));
         this.registry.setAddress(Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.REGISTRY_ADDRESS),"localhost:2181"));
         this.connection = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.REGISTRY_CONNECTION),"netty");
-        this.serializer = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.SERIALIZER),"kryo");
+        this.serializer = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.SERIALIZER),"protostuff");
         this.compression = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.COMPRESSION),"gzip");
         this.kryoRegistration = Objects.requireNonNullElse(this.resolver.getProperty(PropertiesKey.KRYO_REGISTRATION),"true").equals("true");
     }

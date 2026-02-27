@@ -5,5 +5,5 @@ petrel:
     type: zookeeper
     address: 127.0.1.1:2181
   connection: netty
-  serializer: kryo
+  serializer: protostuff
   compression: gzip

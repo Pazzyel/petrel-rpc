@@ -26,7 +26,7 @@ petrel:
     type: zookeeper
     address: localhost:2181
   connection: netty
-  serializer: kryo
+  serializer: protostuff
   compression: gzip
 ```
 
@@ -180,7 +180,29 @@ public class SayServiceImpl implements SayService {
 
 ### serializer
 
-- `kryo`，使用该序列化器，默认需要注册RPC传输的类。在`KryoClassRegistrar`的实现类中向参数添加你要注册的类
+#### Protostuff
+
+默认不选择序列化器时的选项，不需要额外的配置
+
+
+#### Kryo
+
+```yaml
+petrel:
+  serializer: kryo
+```
+
+使用该序列化器，默认需要注册RPC传输的类。
+
+如果你不想注册，可以在配置文件中提供如下配置，以关闭Kryo对注册要序列化的类的需求。这会降低序列化的性能
+
+```yaml
+petrel:
+  config:
+    kryo-registration: false
+```
+
+如果想要使用注册模式，需要在`KryoClassRegistrar`的实现类中向参数添加你要注册的类
 
 ```java
 public class UserKryoClassRegister implements KryoClassRegistrar {
@@ -204,14 +226,6 @@ register=com.pazz.test.client.config.UserKryoClassRegister
 如果你不想使用上面的注册方法，也可以在你的实现类上加上`@Component`或其它注解，让这个实现类作为Spring Bean被管理
 
 RPC调用的参数，返回值，在attachment里设置的内容，都要注册，除了基本类型及其包装类。如果类里还包含其它未注册类型的字段，必须也按同样的逻辑递归注册这些字段的类型
-
-如果你不想注册，可以在配置文件中提供如下配置，以关闭Kryo对注册要序列化的类的需求。这会降低序列化的性能
-
-```yaml
-petrel:
-  config:
-    kryo-registration: false
-```
 
 ### connection
 
